@@ -42,6 +42,6 @@ def generic_fields(number_of_fields):
   return [f'field{field_idx}' for field_idx in range(number_of_fields)]
 
 
-def test_anki_card_init(generic_fields):
+def test_anki_card_init_only_fields(generic_fields):
   card = gaggle.AnkiCard(generic_fields)
   assert card
