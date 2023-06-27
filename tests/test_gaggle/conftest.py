@@ -19,6 +19,7 @@ test_gaggle.py"""
 import csv
 import os.path
 
+import pytest
 import xxhash
 from gaggle import gaggle
 
@@ -80,11 +81,12 @@ def make_static_test_file(header=None, content=None, filename=''):
 
 def generate_well_formed_header():
   # TODO: Implement using AnkiHeader class once implemented
+  # IOBase.writelines() does not provide line terminators
   header_content = [
-      '#separator:tab', '\n', '#html:true', '\n', '#guid column:1', '\n',
-      '#notetype column:2', '\n', '#deck column:3', '\n', '#tags column:7'
+      '#separator:tab\n', '#html:true\n', '#guid column:1\n',
+      '#notetype column:2\n', '#deck column:3\n', '#tags column:7\n'
   ]
-  return ''.join(header_content)
+  return header_content
 
 
 def generate_well_formed_ankicard_data(num_cards=20, num_fields=7):
@@ -94,3 +96,14 @@ def generate_well_formed_ankicard_data(num_cards=20, num_fields=7):
       f'card{card_idx}_field{field_idx}' for field_idx in range(num_fields)
   ] for card_idx in range(num_cards)]
   return rows
+
+
+@pytest.fixture
+def make_anki_export_file_well_formed_header_well_formed_content():
+  header = generate_well_formed_header()
+  content = generate_well_formed_ankicard_data()
+  filename = (
+      f'{make_anki_export_file_well_formed_header_well_formed_content.__name__}'
+  )
+  make_static_test_file(header, content, filename=filename)
+  return True
