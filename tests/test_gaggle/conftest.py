@@ -13,14 +13,19 @@
 #
 # You should have received a copy of the GNU General Public License along with
 # Gaggle. If not, see <https://www.gnu.org/licenses/>.
+# pylint: disable=protected-access
 """Constructs test files used by test_ankicard.py, test_ankideck.py, and
 test_gaggle.py"""
+import csv
 import os.path
 
 import xxhash
+from gaggle import gaggle
 
 TEST_FILE_DIRECTORY = os.path.join('.', 'test_files')
-TSV_FILE_EXTENSION = '.txt'
+TSV_FILE_EXTENSION = gaggle._ANKI_NOTESINPLAINTEXT_EXT
+TSV_FILE_ENCODING = gaggle._ANKI_EXPORT_ENCODING
+TSV_FILE_DIALECT = gaggle._ANKI_EXPORT_CONTENT_DIALECT
 
 
 def generate_file_hash(file, hash_function=None, blocksize=2**20):
@@ -61,15 +66,16 @@ def hashes_are_equal(file1, file2, /, helper_function=None, **kwargs):
   return file1_hash == file2_hash
 
 
-def make_static_test_file(header=None, anki_cards=None, filename=''):
+def make_static_test_file(header=None, content=None, filename=''):
   filename = f'{filename}{TSV_FILE_EXTENSION}'
   path = os.path.join(TEST_FILE_DIRECTORY, filename)
   # TODO: See if file exists and if so, check if hash matches
-  with open(path, mode='x', encoding='utf-8') as f:
+  with open(path, mode='x', encoding=TSV_FILE_ENCODING, newline='') as f:
     if header:
       f.writelines(header)
-    if anki_cards:
-      f.writelines(anki_cards)
+    if content:
+      w = csv.writer(f, dialect=TSV_FILE_DIALECT)
+      w.writerows(content)
 
 
 def generate_well_formed_header():
@@ -79,3 +85,12 @@ def generate_well_formed_header():
       '#notetype column:2', '\n', '#deck column:3', '\n', '#tags column:7'
   ]
   return ''.join(header_content)
+
+
+def generate_well_formed_ankicard_data(num_cards=20, num_fields=7):
+  # TODO: Improve logical coupling with generate_well_formed_header. This should
+  #    be done using the AnkiHeader as formatting information is stored there.
+  rows = [[
+      f'card{card_idx}_field{field_idx}' for field_idx in range(num_fields)
+  ] for card_idx in range(num_cards)]
+  return rows
