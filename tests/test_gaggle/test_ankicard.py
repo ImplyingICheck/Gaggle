@@ -47,6 +47,16 @@ def generic_field_names(number_of_fields):
   return [f'field{field_idx}' for field_idx in range(number_of_fields)]
 
 
+@pytest.fixture
+def has_html_true():
+  return 'true'
+
+
+@pytest.fixture
+def has_html_false():
+  return 'false'
+
+
 def test_anki_card_init_fields(generic_fields):
   card = gaggle.AnkiCard(generic_fields)
   assert card
@@ -54,4 +64,16 @@ def test_anki_card_init_fields(generic_fields):
 
 def test_anki_card_init_fields_field_names(generic_fields, generic_field_names):
   card = gaggle.AnkiCard(generic_fields, generic_field_names)
+  assert card
+
+
+def test_anki_card_init_fields_field_names_has_html_true(
+    generic_fields, generic_field_names, has_html_true):
+  card = gaggle.AnkiCard(generic_fields, generic_field_names, has_html_true)
+  assert card
+
+
+def test_anki_card_init_fields_field_names_has_html_false(
+    generic_fields, generic_field_names, has_html_false):
+  card = gaggle.AnkiCard(generic_fields, generic_field_names, has_html_false)
   assert card
