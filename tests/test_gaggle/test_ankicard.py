@@ -18,6 +18,7 @@
 # pylint: disable=redefined-outer-name
 # pylint: disable=protected-access
 import pytest
+import pytest_cases as pyc
 
 from gaggle import gaggle
 
@@ -52,28 +53,40 @@ def has_html_true():
   return 'true'
 
 
-@pytest.fixture
+@pyc.fixture
 def has_html_false():
   return 'false'
 
 
-def test_anki_card_init_fields(generic_fields):
-  card = gaggle.AnkiCard(generic_fields)
-  assert card
+@pyc.fixture
+def generic_tags_idx(number_of_fields):
+  return number_of_fields - 1
 
 
-def test_anki_card_init_fields_field_names(generic_fields, generic_field_names):
-  card = gaggle.AnkiCard(generic_fields, generic_field_names)
-  assert card
+@pyc.fixture
+def generic_note_type_idx():
+  return 1
 
 
-def test_anki_card_init_fields_field_names_has_html_true(
-    generic_fields, generic_field_names, has_html_true):
-  card = gaggle.AnkiCard(generic_fields, generic_field_names, has_html_true)
-  assert card
+@pyc.fixture
+def generic_deck_idx():
+  return 2
 
 
-def test_anki_card_init_fields_field_names_has_html_false(
-    generic_fields, generic_field_names, has_html_false):
-  card = gaggle.AnkiCard(generic_fields, generic_field_names, has_html_false)
+@pyc.fixture
+def generic_guid_idx():
+  return 0
+
+
+@pyc.parametrize('fields', [generic_fields])
+@pyc.parametrize('field_names', [None, generic_field_names])
+@pyc.parametrize('has_html', [has_html_false, has_html_true])
+@pyc.parametrize('tags_idx', [None, generic_tags_idx])
+@pyc.parametrize('note_type_idx', [None, generic_note_type_idx])
+@pyc.parametrize('deck_idx', [None, generic_deck_idx])
+@pyc.parametrize('guid_idx', [None, generic_guid_idx])
+def test_anki_card_init(fields, field_names, has_html, tags_idx, note_type_idx,
+                        deck_idx, guid_idx):
+  card = gaggle.AnkiCard(fields, field_names, has_html, tags_idx, note_type_idx,
+                         deck_idx, guid_idx)
   assert card
