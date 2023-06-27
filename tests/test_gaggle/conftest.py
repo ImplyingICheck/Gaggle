@@ -70,3 +70,12 @@ def make_static_test_file(header=None, anki_cards=None, filename=''):
       f.writelines(header)
     if anki_cards:
       f.writelines(anki_cards)
+
+
+def generate_well_formed_header():
+  # TODO: Implement using AnkiHeader class once implemented
+  header_content = [
+      '#separator:tab', '\n', '#html:true', '\n', '#guid column:1', '\n',
+      '#notetype column:2', '\n', '#deck column:3', '\n', '#tags column:7'
+  ]
+  return ''.join(header_content)
