@@ -76,7 +76,7 @@ def make_static_test_file(header=None,
   path = os.path.join(TEST_FILE_DIRECTORY, filename)
   if hash_value:
     if hashes_are_equal(path, hash_value, **kwargs):
-      return True
+      return path
     else:
       os.remove(path)
   with open(path, mode='x', encoding=TSV_FILE_ENCODING, newline='') as f:
@@ -85,7 +85,7 @@ def make_static_test_file(header=None,
     if content:
       w = csv.writer(f, dialect=TSV_FILE_DIALECT)
       w.writerows(content)
-  return True
+  return path
 
 
 def generate_well_formed_header():
