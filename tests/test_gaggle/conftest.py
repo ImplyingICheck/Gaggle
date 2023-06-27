@@ -67,16 +67,25 @@ def hashes_are_equal(file1, file2, /, helper_function=None, **kwargs):
   return file1_hash == file2_hash
 
 
-def make_static_test_file(header=None, content=None, filename=''):
+def make_static_test_file(header=None,
+                          content=None,
+                          filename='',
+                          hash_value=None,
+                          **kwargs):
   filename = f'{filename}{TSV_FILE_EXTENSION}'
   path = os.path.join(TEST_FILE_DIRECTORY, filename)
-  # TODO: See if file exists and if so, check if hash matches
+  if hash_value:
+    if hashes_are_equal(path, hash_value, **kwargs):
+      return True
+    else:
+      os.remove(path)
   with open(path, mode='x', encoding=TSV_FILE_ENCODING, newline='') as f:
     if header:
       f.writelines(header)
     if content:
       w = csv.writer(f, dialect=TSV_FILE_DIALECT)
       w.writerows(content)
+  return True
 
 
 def generate_well_formed_header():
@@ -105,5 +114,6 @@ def make_anki_export_file_well_formed_header_well_formed_content():
   filename = (
       f'{make_anki_export_file_well_formed_header_well_formed_content.__name__}'
   )
-  make_static_test_file(header, content, filename=filename)
-  return True
+  hash_value = b'\xff\xabU"\x8f\x05sI\xf7\x1ad\xff\x89c\xeb\xfb'
+  return make_static_test_file(
+      header, content, filename=filename, hash_value=hash_value)
