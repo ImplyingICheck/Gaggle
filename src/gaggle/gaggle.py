@@ -116,6 +116,7 @@ _ANKI_ORDERED_HEADER = [
 ]
 _ANKI_NOTESINPLAINTEXT_EXT = '.txt'
 _ANKI_CARDSINPLAINTEXT_EXT = '.txt'
+_ANKI_EXPORT_CONTENT_DIALECT = 'excel-tab'
 
 GENERIC_EXPORT_FILE_NAME = 'GaggleFile'
 
@@ -745,7 +746,7 @@ class AnkiDeck:
       example using open().
     """
     self.write_header(f)
-    w = csv.writer(f, dialect='excel-tab')
+    w = csv.writer(f, dialect=_ANKI_EXPORT_CONTENT_DIALECT)
     for card in self.cards:
       card.write_as_tsv(w)
 
@@ -770,10 +771,12 @@ def create_cards_from_tsv(
   """
   if header is None:
     header = {}
-  cards = csv.reader(f, dialect='excel-tab')
+  cards = csv.reader(f, dialect=_ANKI_EXPORT_CONTENT_DIALECT)
   deck: list[AnkiCard] = []
   for card in cards:
-    anki_card = AnkiCard(card, field_names=field_names, **header)
+    anki_card = AnkiCard(
+        card, field_names=field_names,
+        **header)  # pyright: ignore [reportGeneralTypeIssues]
     deck.append(anki_card)
   return deck
 
