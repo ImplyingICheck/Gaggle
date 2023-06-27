@@ -117,3 +117,13 @@ def make_anki_export_file_well_formed_header_well_formed_content():
   hash_value = b'\xff\xabU"\x8f\x05sI\xf7\x1ad\xff\x89c\xeb\xfb'
   return make_static_test_file(
       header, content, filename=filename, hash_value=hash_value)
+
+
+@pytest.fixture
+def make_anki_export_file_no_header_well_formed_content():
+  header = None
+  content = generate_well_formed_ankicard_data()
+  filename = f'{make_anki_export_file_no_header_well_formed_content.__name__}'
+  hash_value = b'B\xb6\xaf\x08\x04\x8fb9\xae\xf1\xd4\xb5\x9b\t,*'
+  return make_static_test_file(
+      header, content, filename=filename, hash_value=hash_value)
