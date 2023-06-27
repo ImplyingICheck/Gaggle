@@ -30,3 +30,18 @@ def anki_card(make_anki_export_file_no_header_well_formed_content):
   with open(file_path, 'r', encoding=TSV_FILE_ENCODING) as f:
     source = f.readline()
     return source, gaggle.create_cards_from_tsv(source)
+
+
+@pytest.fixture
+def number_of_fields():
+  return 10
+
+
+@pytest.fixture
+def generic_fields(number_of_fields):
+  return [f'field{field_idx}' for field_idx in range(number_of_fields)]
+
+
+def test_anki_card_init(generic_fields):
+  card = gaggle.AnkiCard(generic_fields)
+  assert card
