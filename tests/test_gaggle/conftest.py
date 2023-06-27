@@ -19,9 +19,14 @@ import os.path
 
 import xxhash
 
+TEST_FILE_DIRECTORY = os.path.join('.', 'test_files')
+TSV_FILE_EXTENSION = '.txt'
 
-def generate_file_xxh128(file, blocksize=2**20):
-  x = xxhash.xxh128()
+
+def generate_file_hash(file, hash_function=None, blocksize=2**20):
+  if hash_function is None:
+    hash_function = xxhash.xxh128
+  x = hash_function()
   with open(file, 'rb') as f:
     while chunk := f.read(blocksize):
       x.update(chunk)
@@ -35,22 +40,33 @@ def set_file_first(file_or_path1, file_or_path2):
     return file_or_path1, file_or_path2
 
 
-def hashes_are_equal(file1, file2, /, hash_function=None, **kwargs):
+def hashes_are_equal(file1, file2, /, helper_function=None, **kwargs):
   """Avoid usage of filecmp and miscellaneous functions from os.path.
   Implementations are not guaranteed across all Linux distributions."""
   file1, file2 = set_file_first(file1, file2)
   file1_is_file = os.path.isfile(file1)
   file2_is_file = os.path.isfile(file2)
   if file1_is_file:
-    if hash_function is None:
-      hash_function = generate_file_xxh128
+    if helper_function is None:
+      helper_function = generate_file_hash
     if file2_is_file:
-      file1_hash = hash_function(file1, **kwargs)
-      file2_hash = hash_function(file2, **kwargs)
+      file1_hash = helper_function(file1, **kwargs)
+      file2_hash = helper_function(file2, **kwargs)
     else:
-      file1_hash = hash_function(file1, **kwargs)
+      file1_hash = helper_function(file1, **kwargs)
       file2_hash = file2
   else:
     file1_hash = file1
     file2_hash = file2
   return file1_hash == file2_hash
+
+
+def make_static_test_file(header=None, anki_cards=None, filename=''):
+  filename = f'{filename}{TSV_FILE_EXTENSION}'
+  path = os.path.join(TEST_FILE_DIRECTORY, filename)
+  # TODO: See if file exists and if so, check if hash matches
+  with open(path, mode='x', encoding='utf-8') as f:
+    if header:
+      f.writelines(header)
+    if anki_cards:
+      f.writelines(anki_cards)
