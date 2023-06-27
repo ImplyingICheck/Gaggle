@@ -16,3 +16,17 @@
 # pylint: disable=missing-module-docstring
 # pylint: disable=missing-class-docstring
 # pylint: disable=redefined-outer-name
+# pylint: disable=protected-access
+import pytest
+
+from gaggle import gaggle
+
+TSV_FILE_ENCODING = gaggle._ANKI_EXPORT_ENCODING
+
+
+@pytest.fixture
+def anki_card(make_anki_export_file_no_header_well_formed_content):
+  file_path = make_anki_export_file_no_header_well_formed_content()
+  with open(file_path, 'r', encoding=TSV_FILE_ENCODING) as f:
+    source = f.readline()
+    return source, gaggle.create_cards_from_tsv(source)
