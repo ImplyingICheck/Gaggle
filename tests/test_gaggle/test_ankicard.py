@@ -128,12 +128,30 @@ def test_reserved_names_specified_returns_value(anki_card_generic_fully_formed,
 
 
 @pyc.fixture
-def anki_card_minimal(generic_field_names):
-  return gaggle.AnkiCard(generic_field_names)
+def anki_card_generic_fields(generic_fields):
+  return gaggle.AnkiCard(generic_fields)
 
 
 @pyc.parametrize('reserved_name', [anki_card_reserved_names_property_names])
-def test_reserved_names_not_specified_raises_key_error(anki_card_minimal,
+def test_reserved_names_not_specified_raises_key_error(anki_card_generic_fields,
                                                        reserved_name):
   with pytest.raises(KeyError):
-    hasattr(anki_card_minimal, reserved_name)
+    hasattr(anki_card_generic_fields, reserved_name)
+
+
+@pyc.fixture
+def generic_field_name_string_base():
+  return 'Field'
+
+
+def test_get_field_existing_field(anki_card_generic_fields,
+                                  generic_field_name_string_base,
+                                  generic_guid_idx, generic_fields):
+  assert (anki_card_generic_fields.get_field(
+      f'{generic_field_name_string_base}{generic_guid_idx}') ==
+          generic_fields[generic_guid_idx])
+
+
+def test_get_field_non_existing_field(anki_card_generic_fields):
+  with pytest.raises(KeyError):
+    anki_card_generic_fields.get_field(None)
