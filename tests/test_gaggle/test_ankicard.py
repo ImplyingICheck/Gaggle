@@ -85,8 +85,9 @@ def generic_guid_idx():
 @pyc.parametrize('note_type_idx', [None, generic_note_type_idx])
 @pyc.parametrize('deck_idx', [None, generic_deck_idx])
 @pyc.parametrize('guid_idx', [None, generic_guid_idx])
-def test_anki_card_init(fields, field_names, has_html, tags_idx, note_type_idx,
-                        deck_idx, guid_idx):
+def test_anki_card_init_generic_arguments(fields, field_names, has_html,
+                                          tags_idx, note_type_idx, deck_idx,
+                                          guid_idx):
   card = gaggle.AnkiCard(fields, field_names, has_html, tags_idx, note_type_idx,
                          deck_idx, guid_idx)
   assert card
