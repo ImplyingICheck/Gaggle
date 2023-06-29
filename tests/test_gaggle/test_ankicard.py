@@ -17,6 +17,8 @@
 # pylint: disable=missing-class-docstring
 # pylint: disable=redefined-outer-name
 # pylint: disable=protected-access
+import collections
+
 import pytest
 import pytest_cases as pyc
 
@@ -155,3 +157,13 @@ def test_get_field_existing_field(anki_card_generic_fields,
 def test_get_field_non_existing_field(anki_card_generic_fields):
   with pytest.raises(KeyError):
     anki_card_generic_fields.get_field(None)
+
+
+def test_as_str_list_content_matches(anki_card_generic_fields, generic_fields):
+  test_set = collections.Counter(anki_card_generic_fields.as_str_list())
+  expected_set = collections.Counter(generic_fields)
+  assert test_set == expected_set
+
+
+def test_as_str_list_order_matches(anki_card_generic_fields, generic_fields):
+  assert anki_card_generic_fields.as_str_list() == generic_fields
