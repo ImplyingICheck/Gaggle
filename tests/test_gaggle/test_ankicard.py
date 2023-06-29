@@ -122,6 +122,18 @@ def anki_card_reserved_names_property_names(reserved_name):
 
 
 @pyc.parametrize('reserved_name', [anki_card_reserved_names_property_names])
-def test_reserved_names_correspond_to_property_name_specified(
-    anki_card_generic_fully_formed, reserved_name):
+def test_reserved_names_specified_returns_value(anki_card_generic_fully_formed,
+                                                reserved_name):
   assert hasattr(anki_card_generic_fully_formed, reserved_name)
+
+
+@pyc.fixture
+def anki_card_minimal(generic_field_names):
+  return gaggle.AnkiCard(generic_field_names)
+
+
+@pyc.parametrize('reserved_name', [anki_card_reserved_names_property_names])
+def test_reserved_names_not_specified_raises_key_error(anki_card_minimal,
+                                                       reserved_name):
+  with pytest.raises(KeyError):
+    hasattr(anki_card_minimal, reserved_name)
