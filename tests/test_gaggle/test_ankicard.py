@@ -91,3 +91,37 @@ def test_anki_card_init_generic_arguments(fields, field_names, has_html,
   card = gaggle.AnkiCard(fields, field_names, has_html, tags_idx, note_type_idx,
                          deck_idx, guid_idx)
   assert card
+
+
+@pyc.fixture
+def anki_card_generic_fully_formed(generic_fields, generic_field_names,
+                                   has_html_false, generic_tags_idx,
+                                   generic_note_type_idx, generic_deck_idx,
+                                   generic_guid_idx):
+  return gaggle.AnkiCard(generic_fields, generic_field_names, has_html_false,
+                         generic_tags_idx, generic_note_type_idx,
+                         generic_deck_idx, generic_guid_idx)
+
+
+@pyc.fixture
+@pyc.parametrize('reserved_name', ['Tags', 'Deck', 'Note Type', 'GUID'])
+def anki_card_reserved_names_field_names(reserved_name):
+  """These names are guaranteed by the public API. They cannot be assigned
+  manually (passed as field_names), cannot be duplicated (used in field_names
+  and specified by argument), and each is accessible as a property."""
+  return reserved_name
+
+
+@pyc.fixture
+@pyc.parametrize('reserved_name', ['tags', 'deck_name', 'note_type', 'guid'])
+def anki_card_reserved_names_property_names(reserved_name):
+  """These names are guaranteed by the public API. They cannot be assigned
+  manually (passed as field_names), cannot be duplicated (used in field_names
+  and specified by argument), and each is accessible as a property."""
+  return reserved_name
+
+
+@pyc.parametrize('reserved_name', [anki_card_reserved_names_property_names])
+def test_reserved_names_correspond_to_property_name_specified(
+    anki_card_generic_fully_formed, reserved_name):
+  assert hasattr(anki_card_generic_fully_formed, reserved_name)
