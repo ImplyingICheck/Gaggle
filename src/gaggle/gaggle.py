@@ -13,6 +13,8 @@
 #
 # You should have received a copy of the GNU General Public License along with
 # Gaggle. If not, see <https://www.gnu.org/licenses/>.
+# Bug when using open() with **kwargs. Fixed in 2.17.5
+# pylint: disable=unspecified-encoding
 """Base class for collection, a class representing multiple Anki Decks."""
 from __future__ import annotations
 
@@ -26,7 +28,7 @@ import operator
 import enum
 import warnings
 from _csv import Dialect
-from typing import overload, Any, ParamSpec, Protocol, Self, SupportsIndex, SupportsInt, TypeVar, TYPE_CHECKING
+from typing import overload, Any, ParamSpec, Protocol, Self, SupportsIndex, SupportsInt, TypedDict, TypeVar, TYPE_CHECKING
 from collections.abc import Callable, Iterable, Iterator, Mapping, MutableMapping, Sized
 
 from gaggle import exceptions
@@ -119,6 +121,24 @@ _ANKI_CARDSINPLAINTEXT_EXT = '.txt'
 _ANKI_EXPORT_CONTENT_DIALECT = 'excel-tab'
 
 GENERIC_EXPORT_FILE_NAME = 'GaggleFile'
+
+
+class OpenOptions(TypedDict):
+  mode: str
+  encoding: str
+  newline: str
+
+
+EXCLUSIVE_OPEN_PARAMS: OpenOptions = {
+    'mode': 'x',
+    'encoding': _ANKI_EXPORT_ENCODING,
+    'newline': ''
+}
+READ_PARAMS: OpenOptions = {
+    'mode': 'r',
+    'encoding': _ANKI_EXPORT_ENCODING,
+    'newline': ''
+}
 
 
 class ReformatDirection(enum.StrEnum):
@@ -418,9 +438,7 @@ class Gaggle:
     if isinstance(deck, int):
       deck = self.get_deck(deck)
     file_path = _generate_unique_file_path(filename, extension, destination)
-    encoding = _ANKI_EXPORT_ENCODING
-    mode = 'x'
-    with open(file_path, mode=mode, encoding=encoding, newline='') as f:
+    with open(file_path, **EXCLUSIVE_OPEN_PARAMS) as f:
       if file_type in (_ANKI_NOTESINPLAINTEXT_EXT, _ANKI_NOTESINPLAINTEXT_EXT):
         deck.write_as_tsv(f)
       else:
@@ -642,7 +660,7 @@ def _parse_anki_export(
   seperator_setting_key = _ANKI_EXPORT_HEADER_SETTING_SEPARATOR_NAME
   tsv = _ANKI_EXPORT_HEADER_SETTING_SEPARATOR_TSV_STRING
   cards = []
-  with open(exported_file, encoding=_ANKI_EXPORT_ENCODING) as f:
+  with open(exported_file, **READ_PARAMS) as f:
     header = parse_header_settings(f)
     if header[seperator_setting_key] == tsv:
       del header[seperator_setting_key]

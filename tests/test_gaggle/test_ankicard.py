@@ -17,6 +17,8 @@
 # pylint: disable=missing-class-docstring
 # pylint: disable=redefined-outer-name
 # pylint: disable=protected-access
+# Bug when using open() with **kwargs. Fixed in 2.17.5
+# pylint: disable=unspecified-encoding
 import collections
 import csv
 import io
@@ -28,12 +30,15 @@ from gaggle import gaggle
 
 TSV_FILE_ENCODING = gaggle._ANKI_EXPORT_ENCODING
 TSV_FILE_DIALECT = gaggle._ANKI_EXPORT_CONTENT_DIALECT
+EXCLUSIVE_OPEN_PARAMS = gaggle.EXCLUSIVE_OPEN_PARAMS
+READ_PARAMS = gaggle.READ_PARAMS
+WRITE_PARAMS = {'mode': 'w', 'encoding': TSV_FILE_ENCODING, 'newline': ''}
 
 
 @pytest.fixture
 def anki_card(make_anki_export_file_no_header_well_formed_content):
   file_path = make_anki_export_file_no_header_well_formed_content()
-  with open(file_path, 'r', encoding=TSV_FILE_ENCODING) as f:
+  with open(file_path, **READ_PARAMS) as f:
     source = f.readline()
     return source, gaggle.create_cards_from_tsv(source)
 
@@ -175,10 +180,10 @@ def test_as_str_list_order_matches(anki_card_generic_fields, generic_fields):
 def test_write_as_tsv_csv_writer_one_line(tmp_path, anki_card_generic_fields,
                                           generic_fields):
   file = tmp_path / 'test_write_as_tsv_csv_writer_one_line.txt'
-  with open(file, encoding=TSV_FILE_ENCODING, mode='w', newline='') as f:
+  with open(file, **WRITE_PARAMS) as f:
     w = csv.writer(f, dialect=TSV_FILE_DIALECT)
     anki_card_generic_fields.write_as_tsv(w)
-  with open(file, encoding=TSV_FILE_ENCODING, mode='r', newline='') as f:
+  with open(file, **READ_PARAMS) as f:
     r = csv.reader(f, dialect=TSV_FILE_DIALECT)
     test_card = next(r)
     assert test_card == generic_fields
@@ -188,12 +193,12 @@ def test_write_as_tsv_csv_writer_multiple_lines(tmp_path,
                                                 anki_card_generic_fields,
                                                 generic_fields):
   file = tmp_path / 'test_write_as_tsv_csv_writer_multiple_lines.txt'
-  with open(file, encoding=TSV_FILE_ENCODING, mode='w', newline='') as f:
+  with open(file, **WRITE_PARAMS) as f:
     w = csv.writer(f, dialect=TSV_FILE_DIALECT)
     anki_card_generic_fields.write_as_tsv(w)
     anki_card_generic_fields.write_as_tsv(w)
   expected_card = generic_fields
-  with open(file, encoding=TSV_FILE_ENCODING, mode='r', newline='') as f:
+  with open(file, **READ_PARAMS) as f:
     r = csv.reader(f, dialect=TSV_FILE_DIALECT)
     for test_card in r:
       assert test_card == expected_card
@@ -204,11 +209,11 @@ def test_write_as_tsv_no_write_permission_raises_unsupported_operation(
   file = tmp_path / ('test_write_as_tsv_no_write_permission_raises_unsupported_'
                      'operation.txt')
   try:
-    open(file, encoding=TSV_FILE_ENCODING, mode='x')  #pylint: disable='consider-using-with'
+    open(file, **EXCLUSIVE_OPEN_PARAMS)  #pylint: disable='consider-using-with'
   except:  # pylint: disable='bare-except'
     pytest.fail('Test file could not be created. Required to simulate improper '
                 'file permissions.')
-  with open(file, encoding=TSV_FILE_ENCODING, mode='r', newline='') as f:
+  with open(file, **READ_PARAMS) as f:
     w = csv.writer(f, dialect=TSV_FILE_DIALECT)
     with pytest.raises(io.UnsupportedOperation):
       anki_card_generic_fields.write_as_tsv(w)
