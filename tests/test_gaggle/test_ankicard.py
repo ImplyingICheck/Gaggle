@@ -36,14 +36,6 @@ WRITE_PARAMS = {'mode': 'w', 'encoding': TSV_FILE_ENCODING, 'newline': ''}
 
 
 @pytest.fixture
-def anki_card(make_anki_export_file_no_header_well_formed_content):
-  file_path = make_anki_export_file_no_header_well_formed_content()
-  with open(file_path, **READ_PARAMS) as f:
-    source = f.readline()
-    return source, gaggle.create_cards_from_tsv(source)
-
-
-@pytest.fixture
 def number_of_fields():
   return 10
 
