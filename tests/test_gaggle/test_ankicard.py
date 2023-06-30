@@ -213,3 +213,14 @@ def test_write_as_tsv_no_write_permission_raises_unsupported_operation(
     w = csv.writer(f, dialect=TSV_FILE_DIALECT)
     with pytest.raises(io.UnsupportedOperation):
       anki_card_generic_fields.write_as_tsv(w)
+
+
+@pyc.parametrize('has_html, expected', [(has_html_false, False),
+                                        (has_html_true, True)])
+def test_parse_anki_header_bool_valid_input(has_html, expected):
+  assert gaggle._parse_anki_header_bool(has_html) == expected
+
+
+def test_parse_anki_header_bool_invalid_value_raises_value_error():
+  with pytest.raises(ValueError):
+    gaggle._parse_anki_header_bool('')
