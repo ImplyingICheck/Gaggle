@@ -32,7 +32,11 @@ TSV_FILE_ENCODING = gaggle._ANKI_EXPORT_ENCODING
 TSV_FILE_DIALECT = gaggle._ANKI_EXPORT_CONTENT_DIALECT
 EXCLUSIVE_OPEN_PARAMS = gaggle.EXCLUSIVE_OPEN_PARAMS
 READ_PARAMS = gaggle.READ_PARAMS
-WRITE_PARAMS = {'mode': 'w', 'encoding': TSV_FILE_ENCODING, 'newline': ''}
+WRITE_PARAMS: gaggle.OpenOptions = {
+    'mode': 'w',
+    'encoding': TSV_FILE_ENCODING,
+    'newline': ''
+}
 
 
 @pytest.fixture
