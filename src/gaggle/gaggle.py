@@ -387,7 +387,7 @@ class Gaggle:
     """
     self.decks: list[AnkiDeck] = _initialise_decks(exported_file, field_names)
 
-  def __iter__(self):
+  def __iter__(self) -> Iterator[AnkiDeck]:
     return iter(self.decks)
 
   def add_deck(self, deck: AnkiDeck) -> None:
@@ -705,7 +705,7 @@ class AnkiDeck:
     header, cards = _parse_anki_export(file, field_names)
     return cls(header, cards)
 
-  def __iter__(self):
+  def __iter__(self) -> Iterator[AnkiCard]:
     return iter(self.cards)
 
   def get_header_setting(
@@ -929,7 +929,7 @@ class AnkiCard:
                guid_idx: int | None = None):
     if field_names is None:
       field_names = ()
-    self.has_html = _parse_anki_header_bool(has_html)
+    self.has_html: bool = _parse_anki_header_bool(has_html)
     property_indexes = [tags_idx, deck_idx, note_type_idx, guid_idx]
     reserved_names = {
         index: name
@@ -940,7 +940,8 @@ class AnkiCard:
     reserved_name_set = set(AnkiCard._reserved_names)
     field_names = _generate_unique_field_names(
         iter(field_names), iter(fields), reserved_names, reserved_name_set)
-    self.fields = _generate_field_dict(iter(field_names), iter(fields))
+    self.fields: collections.OrderedDict[str, str] = _generate_field_dict(
+        iter(field_names), iter(fields))
 
   @property
   def tags(self) -> str:
@@ -1001,7 +1002,7 @@ class AnkiCard:
     """
     return self.get_field('GUID')
 
-  def __repr__(self):
+  def __repr__(self) -> str:
     return str(self.fields)
 
   def get_field(self, field_name: str) -> str:

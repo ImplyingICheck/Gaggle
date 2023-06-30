@@ -31,7 +31,7 @@ class DecksNotWrittenException(Exception):
     """
     self.last_deck_written = last_deck_written
 
-  def __str__(self):
+  def __str__(self) -> str:
     return (f'Failed to write all Decks to the file. '
             f'Last deck successfully written was the deck at: '
             f'Index {self.last_deck_written}')
@@ -54,7 +54,7 @@ class DuplicateWarning(Warning):
     """
     self.duplicate_value = duplicate_value
     self.replacement_value = replacement_value
-    self.message = self._create_message(context_message)
+    self.message: str = self._create_message(context_message)
 
   def _create_message(self, context_message: Any) -> str:
     """Creates value of DuplicateWarning.message
@@ -69,7 +69,7 @@ class DuplicateWarning(Warning):
     return (f'Duplicate {context_message} (replaced with: '
             f'{self.replacement_value}): {self.duplicate_value}')
 
-  def __str__(self):
+  def __str__(self) -> str:
     return self.message
 
 
@@ -80,9 +80,9 @@ class LeftoverArgumentWarning(Warning):
   def __init__(self, context_message: Any, leftovers: Iterable[Any],
                leftover_name: Any):
     self.leftovers = leftovers
-    self.message = self._create_message(context_message, leftover_name)
+    self.message: str = self._create_message(context_message, leftover_name)
 
-  def __str__(self):
+  def __str__(self) -> str:
     return self.message
 
   @classmethod
