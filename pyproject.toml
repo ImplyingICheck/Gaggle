@@ -49,7 +49,7 @@ ignore_patterns = [
 based_on_style = "yapf"
 
 [tool.pyright]
-include = ["src"]
+include = ["src", "tests"]
 exclude = ["dev_files/*.py"]
 strict = ["src/gaggle"]
 reportMissingImports = true
