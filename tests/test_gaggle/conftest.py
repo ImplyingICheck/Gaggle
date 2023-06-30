@@ -30,6 +30,8 @@ TSV_FILE_DIALECT = gaggle._ANKI_EXPORT_CONTENT_DIALECT
 
 
 def generate_file_hash(file, hash_function=None, blocksize=2**20):
+  """Collision resistance of xxh128 is sufficient for our verification needs.
+  For more granular collision testing, use haslib.SHA512 as the hash_function"""
   if hash_function is None:
     hash_function = xxhash.xxh128
   x = hash_function()
