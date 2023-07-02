@@ -806,7 +806,7 @@ _stack_levels_to_anki_card_init_call = 4
 @propagate_warnings_from_generator(_stack_levels_to_anki_card_init_call)
 def _generate_unique_field_names(field_names: Iterator[str],
                                  fields: Iterator[Any],
-                                 reserved_names: Mapping[int, str],
+                                 indexes_reserved_names: Mapping[int, str],
                                  seen_names: set[str]) -> Iterator[str]:
   """Generator for field names; prevents duplicate names from being returned.
 
@@ -823,8 +823,12 @@ def _generate_unique_field_names(field_names: Iterator[str],
       Falsy value to apply a default field name.
     fields: The fields to be named. Used as a reference for length, not
       modified. Iterator is exhausted.
-    reserved_names: Names
-    seen_names:
+    indexes_reserved_names: An index representing the column to which assign
+      the corresponding reserved name.
+    seen_names: Names designated as unique and cannot be assigned through
+      field_names. Should always contain at least AnkiCard._reserved_names for
+      assumptions of class properties to hold. May contain extra values to be
+      protected (i.e. prevented from being assigned).
 
   Yields:
     Unique values from field_names
@@ -848,7 +852,7 @@ def _generate_unique_field_names(field_names: Iterator[str],
                 context_message='More field names than fields',
                 leftover_name='field names'))
       return
-    if (reserved_name := reserved_names.get(count)) is not None:
+    if (reserved_name := indexes_reserved_names.get(count)) is not None:
       yield reserved_name
     else:
       if name in seen_names:
