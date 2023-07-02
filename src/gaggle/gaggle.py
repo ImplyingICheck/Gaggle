@@ -839,6 +839,9 @@ def _generate_unique_field_names(field_names: Iterator[str] | Iterable[str],
     DuplicateWarning: Raised in two situations. If field_names contains a name
     specified by reserved_names. If field_names contains a duplicate value.
     LeftoverArgumentWarning: If field_names contains more values than fields
+    HeaderFieldNameMismatchWarning: If field_names contains a non-empty string
+      which contradicts a value specified by indexes_reserved_names. Takes
+      precedence over DuplicateWarning when both apply.
   """
   field_names = iter(field_names)
   fields = iter(fields)
@@ -855,6 +858,12 @@ def _generate_unique_field_names(field_names: Iterator[str] | Iterable[str],
                 leftover_name='field names'))
       return
     if (reserved_name := indexes_reserved_names.get(count)) is not None:
+      if name and name != reserved_name:
+        warnings.warn(
+            exceptions.HeaderFieldNameMismatchWarning(
+                overwritten_value=name,
+                replacement_value=reserved_name,
+            ))
       yield reserved_name
     else:
       if name in seen_names:
