@@ -872,8 +872,8 @@ def _generate_unique_field_names(field_names: Iterator[str] | Iterable[str],
 
 
 def _generate_field_dict(
-    field_names: Iterator[_T],
-    fields: Iterator[_S],
+    field_names: Iterator[_T] | Iterable[_T],
+    fields: Iterator[_S] | Iterable[_S],
 ) -> collections.OrderedDict[_T, _S]:
   """Create a dictionary mapping given names to a value in AnkiCard.
 
@@ -889,6 +889,8 @@ def _generate_field_dict(
   Raises:
     ValueError: If field_names and fields are not of matching length.
   """
+  field_names = iter(field_names)
+  fields = iter(fields)
   name_field_tuples = zip(field_names, fields, strict=True)
   return collections.OrderedDict(name_field_tuples)
 
