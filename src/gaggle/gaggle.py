@@ -949,10 +949,11 @@ class AnkiCard:
         if index is not None
     }
     reserved_name_set = set(AnkiCard._reserved_names)
-    field_names = _generate_unique_field_names(
-        iter(field_names), iter(fields), reserved_names, reserved_name_set)
+    field_names = _generate_unique_field_names(field_names, fields,
+                                               reserved_names,
+                                               reserved_name_set)
     self.fields: collections.OrderedDict[str, str] = _generate_field_dict(
-        iter(field_names), iter(fields))
+        field_names, fields)
 
   @property
   def tags(self) -> str:
