@@ -879,6 +879,9 @@ def _generate_field_dict(
 
   Returns:
     Named values whose iteration order is the same as read from file.
+
+  Raises:
+    ValueError: If field_names and fields are not of matching length.
   """
   name_field_tuples = zip(field_names, fields, strict=True)
   return collections.OrderedDict(name_field_tuples)
