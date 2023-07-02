@@ -224,3 +224,35 @@ def test_parse_anki_header_bool_valid_input(has_html, expected):
 def test_parse_anki_header_bool_invalid_value_raises_value_error():
   with pytest.raises(ValueError):
     gaggle._parse_anki_header_bool('')
+
+
+@pyc.fixture
+def generic_field_dict(generic_field_names, generic_fields):
+  test = gaggle._generate_field_dict(
+      iter(generic_field_names), iter(generic_fields))
+  return test
+
+
+def test_generate_field_dict_returns_ordered_dict(generic_field_dict):
+  assert isinstance(generic_field_dict, collections.OrderedDict)
+
+
+def test_generate_field_dict_preserves_order_field_values(
+    generic_field_dict, generic_fields):
+  for test_value, expected_value in zip(generic_field_dict.values(),
+                                        generic_fields):
+    assert test_value == expected_value
+
+
+def test_generate_field_dict_preserves_order_field_names(
+    generic_field_dict, generic_field_names):
+  for test_value, expected_value in zip(generic_field_dict.keys(),
+                                        generic_field_names):
+    assert test_value == expected_value
+
+
+def test_generate_field_dict_mismatched_length_raises_value_error(
+    generic_field_names, generic_fields):
+  generic_fields.append('Extend Values By One')
+  with pytest.raises(ValueError):
+    gaggle._generate_field_dict(iter(generic_field_names), iter(generic_fields))
