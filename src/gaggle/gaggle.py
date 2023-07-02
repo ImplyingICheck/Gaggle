@@ -804,8 +804,8 @@ _stack_levels_to_anki_card_init_call = 4
 
 
 @propagate_warnings_from_generator(_stack_levels_to_anki_card_init_call)
-def _generate_unique_field_names(field_names: Iterator[str],
-                                 fields: Iterator[Any],
+def _generate_unique_field_names(field_names: Iterator[str] | Iterable[str],
+                                 fields: Iterator[Any] | Iterable[Any],
                                  indexes_reserved_names: Mapping[int, str],
                                  seen_names: set[str]) -> Iterator[str]:
   """Generator for field names; prevents duplicate names from being returned.
@@ -840,6 +840,8 @@ def _generate_unique_field_names(field_names: Iterator[str],
     specified by reserved_names. If field_names contains a duplicate value.
     LeftoverArgumentWarning: If field_names contains more values than fields
   """
+  field_names = iter(field_names)
+  fields = iter(fields)
   for count in itertools.count():
     name = next(field_names, None)
     field_to_be_named = next(fields, None)
