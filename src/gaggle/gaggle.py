@@ -834,9 +834,9 @@ def _generate_unique_field_names(field_names: Iterator[str] | Iterable[str],
     Unique values from field_names
 
   Raises:
-    ValueError: If an index-bound generic name is used before a field would have
-     been named using that name by default. For example, naming Field0 "Field2"
-     and then having no field name specified for Field2.
+    ValueError: If an index-bound default name is reserved before a field would
+      have used that name. For example, naming Field0 "Field2" and then having
+      no field name specified for Field2.
     DuplicateWarning: Raised in two situations. If field_names contains a name
       specified by reserved_names. If field_names contains a duplicate value.
     LeftoverArgumentWarning: If field_names contains more values than fields
