@@ -28,6 +28,7 @@ from typing import cast
 
 import pytest
 import pytest_cases as pyc
+from .conftest import new_header_gaggle_format, new_field_names_remove_reserved  # pylint: disable=relative-beyond-top-level
 
 from gaggle import gaggle
 from gaggle import exceptions
@@ -533,3 +534,16 @@ def test_generate_unique_field_names_multiple_duplicate_default_name_before_assi
                          1] = duplicated_field_name
   with pytest.raises(ValueError):
     generic_unique_field_names_constructor(field_names=duplicate_default_name)
+
+
+@pyc.parametrize('field_names', [None, new_field_names_remove_reserved])
+@pyc.parametrize('header', [None, new_header_gaggle_format])
+def test_create_cards_from_tsv_well_formed_arguments(
+    case_anki_export_file_no_header_well_formed_content, field_names, header):
+  # TODO: This is a minimal test suite for create_cards_from_tsv
+  #   See: https://github.com/ImplyingICheck/Gaggle/issues/32
+  test_file_path = case_anki_export_file_no_header_well_formed_content
+  with open(test_file_path, **READ_PARAMS) as f:
+    deck = gaggle.create_cards_from_tsv(
+        f, field_names=field_names, header=header)
+  assert deck

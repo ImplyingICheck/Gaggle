@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License along with
 # Gaggle. If not, see <https://www.gnu.org/licenses/>.
 # pylint: disable=protected-access
+# pylint: disable=redefined-outer-name
 """Constructs test files used by test_ankicard.py, test_ankideck.py, and
 test_gaggle.py"""
 import csv
@@ -30,6 +31,8 @@ TEST_FILE_DIRECTORY = os.path.join(TEST_FILE_DIRECTORY, 'test_files')
 TSV_FILE_EXTENSION = gaggle._ANKI_NOTESINPLAINTEXT_EXT
 TSV_FILE_ENCODING = gaggle._ANKI_EXPORT_ENCODING
 TSV_FILE_DIALECT = gaggle._ANKI_EXPORT_CONTENT_DIALECT
+
+NUM_FIELDS = 7
 
 
 def generate_file_hash(file, hash_function=None, blocksize=2**20):
@@ -107,13 +110,28 @@ def generate_well_formed_header():
   return header_content
 
 
-def generate_well_formed_ankicard_data(num_cards=20, num_fields=7):
+def generate_well_formed_ankicard_data(num_cards=20):
   # TODO: Improve logical coupling with generate_well_formed_header. This should
   #    be done using the AnkiHeader as formatting information is stored there.
   rows = [[
-      f'card{card_idx}_field{field_idx}' for field_idx in range(num_fields)
+      f'card{card_idx}_field{field_idx}' for field_idx in range(NUM_FIELDS)
   ] for card_idx in range(num_cards)]
   return rows
+
+
+@pyc.fixture
+def new_header_gaggle_format():
+  contents = [('guid_idx', 0), ('note_type_idx', 1), ('deck_idx', 2),
+              ('tags_idx', 6)]
+  return dict(contents)
+
+
+@pyc.fixture
+def new_field_names_remove_reserved(new_header_gaggle_format):
+  field_names = [f'Field{field_idx}' for field_idx in range(NUM_FIELDS)]
+  for index in new_header_gaggle_format.values():
+    field_names[index] = ''
+  return field_names
 
 
 @pyc.fixture
