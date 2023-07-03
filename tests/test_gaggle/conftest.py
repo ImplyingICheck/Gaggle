@@ -18,12 +18,15 @@
 test_gaggle.py"""
 import csv
 import os.path
+import stat
+import pathlib
 
-import pytest
+import pytest_cases as pyc
 import xxhash
 from gaggle import gaggle
 
-TEST_FILE_DIRECTORY = os.path.join('.', 'test_files')
+TEST_FILE_DIRECTORY = pathlib.Path(os.path.join(__file__)).parents[2]
+TEST_FILE_DIRECTORY = os.path.join(TEST_FILE_DIRECTORY, 'test_files')
 TSV_FILE_EXTENSION = gaggle._ANKI_NOTESINPLAINTEXT_EXT
 TSV_FILE_ENCODING = gaggle._ANKI_EXPORT_ENCODING
 TSV_FILE_DIALECT = gaggle._ANKI_EXPORT_CONTENT_DIALECT
@@ -69,25 +72,29 @@ def hashes_are_equal(file1, file2, /, helper_function=None, **kwargs):
   return file1_hash == file2_hash
 
 
-def make_static_test_file(header=None,
-                          content=None,
-                          filename='',
-                          hash_value=None,
-                          **kwargs):
+def make_read_only_test_file(header=None,
+                             content=None,
+                             filename='',
+                             hash_value=None,
+                             **kwargs):
   filename = f'{filename}{TSV_FILE_EXTENSION}'
   path = os.path.join(TEST_FILE_DIRECTORY, filename)
   if hash_value:
     if hashes_are_equal(path, hash_value, **kwargs):
       return path
     else:
-      os.remove(path)
+      try:
+        os.remove(path)
+      except FileNotFoundError:
+        pass
   with open(path, mode='x', encoding=TSV_FILE_ENCODING, newline='') as f:
     if header:
       f.writelines(header)
     if content:
       w = csv.writer(f, dialect=TSV_FILE_DIALECT)
       w.writerows(content)
-  return path
+  os.chmod(path, stat.S_IREAD)
+  return os.path.abspath(path)
 
 
 def generate_well_formed_header():
@@ -109,7 +116,7 @@ def generate_well_formed_ankicard_data(num_cards=20, num_fields=7):
   return rows
 
 
-@pytest.fixture
+@pyc.fixture
 def case_anki_export_file_well_formed_header_well_formed_content():
   header = generate_well_formed_header()
   content = generate_well_formed_ankicard_data()
@@ -117,25 +124,25 @@ def case_anki_export_file_well_formed_header_well_formed_content():
       f'{case_anki_export_file_well_formed_header_well_formed_content.__name__}'
   )
   hash_value = b'\xff\xabU"\x8f\x05sI\xf7\x1ad\xff\x89c\xeb\xfb'
-  return make_static_test_file(
+  return make_read_only_test_file(
       header, content, filename=filename, hash_value=hash_value)
 
 
-@pytest.fixture
+@pyc.fixture
 def case_anki_export_file_no_header_well_formed_content():
   header = None
   content = generate_well_formed_ankicard_data()
   filename = f'{case_anki_export_file_no_header_well_formed_content.__name__}'
   hash_value = b'B\xb6\xaf\x08\x04\x8fb9\xae\xf1\xd4\xb5\x9b\t,*'
-  return make_static_test_file(
+  return make_read_only_test_file(
       header, content, filename=filename, hash_value=hash_value)
 
 
-@pytest.fixture
+@pyc.fixture
 def case_anki_export_file_well_formed_header_no_content():
   header = generate_well_formed_header()
   content = None
   filename = f'{case_anki_export_file_well_formed_header_no_content.__name__}'
   hash_value = b'\xf1\\\x966(\x80\x9c\x86>d\x0c\xb8\x94\xf3\x9c\xc4'
-  return make_static_test_file(
+  return make_read_only_test_file(
       header, content, filename=filename, hash_value=hash_value)
