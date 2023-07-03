@@ -834,10 +834,11 @@ def _generate_unique_field_names(field_names: Iterator[str] | Iterable[str],
     Unique values from field_names
 
   Raises:
-    ValueError: If an index-bound generic name is duplicated and least two
-    duplicates are not specified in reserved_names
+    ValueError: If an index-bound generic name is used before a field would have
+     been named using that name by default. For example, naming Field0 "Field2"
+     and then having no field name specified for Field2.
     DuplicateWarning: Raised in two situations. If field_names contains a name
-    specified by reserved_names. If field_names contains a duplicate value.
+      specified by reserved_names. If field_names contains a duplicate value.
     LeftoverArgumentWarning: If field_names contains more values than fields
     HeaderFieldNameMismatchWarning: If field_names contains a non-empty string
       which contradicts a value specified by indexes_reserved_names. Takes
