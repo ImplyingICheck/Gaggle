@@ -27,7 +27,7 @@ import warnings
 from typing import cast
 
 import pytest
-import pytest_cases as pyc
+import pytest_cases
 from .conftest import new_header_gaggle_format, new_field_names_remove_reserved  # pylint: disable=relative-beyond-top-level
 
 from gaggle import gaggle
@@ -44,22 +44,22 @@ WRITE_PARAMS: gaggle.OpenOptions = {
 }
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def number_of_fields():
   return 10
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_fields(number_of_fields):
   return [f'value{field_idx}' for field_idx in range(number_of_fields)]
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def anki_card_reserved_names():
   return ['Tags', 'Deck', 'Note Type', 'GUID']
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_indexes_reserved_names_mapping(
     generic_tags_idx,
     generic_deck_idx,
@@ -74,13 +74,13 @@ def generic_indexes_reserved_names_mapping(
   return dict(zip(indexes, anki_card_reserved_names))
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_field_names(number_of_fields):
   field_names = [f'Field{field_idx}' for field_idx in range(number_of_fields)]
   return field_names
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_field_names_remove_reserved(generic_field_names,
                                         generic_indexes_reserved_names_mapping):
   field_names = generic_field_names
@@ -89,7 +89,7 @@ def generic_field_names_remove_reserved(generic_field_names,
   return field_names
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_field_names_add_reserved(generic_field_names,
                                      generic_indexes_reserved_names_mapping):
   field_names = generic_field_names
@@ -98,43 +98,44 @@ def generic_field_names_add_reserved(generic_field_names,
   return field_names
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def has_html_true():
   return 'true'
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def has_html_false():
   return 'false'
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_tags_idx(number_of_fields):
   return number_of_fields - 1
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_note_type_idx():
   return 1
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_deck_idx():
   return 2
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_guid_idx():
   return 0
 
 
-@pyc.parametrize('fields', [generic_fields])
-@pyc.parametrize('field_names', [None, generic_field_names_remove_reserved])
-@pyc.parametrize('has_html', [has_html_false, has_html_true])
-@pyc.parametrize('tags_idx', [None, generic_tags_idx])
-@pyc.parametrize('note_type_idx', [None, generic_note_type_idx])
-@pyc.parametrize('deck_idx', [None, generic_deck_idx])
-@pyc.parametrize('guid_idx', [None, generic_guid_idx])
+@pytest_cases.parametrize('fields', [generic_fields])
+@pytest_cases.parametrize('field_names',
+                          [None, generic_field_names_remove_reserved])
+@pytest_cases.parametrize('has_html', [has_html_false, has_html_true])
+@pytest_cases.parametrize('tags_idx', [None, generic_tags_idx])
+@pytest_cases.parametrize('note_type_idx', [None, generic_note_type_idx])
+@pytest_cases.parametrize('deck_idx', [None, generic_deck_idx])
+@pytest_cases.parametrize('guid_idx', [None, generic_guid_idx])
 def test_anki_card_init_generic_arguments(
     fields,
     field_names,
@@ -149,7 +150,7 @@ def test_anki_card_init_generic_arguments(
   assert card
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def anki_card_generic_fully_formed(
     generic_fields,
     generic_field_names_remove_reserved,
@@ -165,8 +166,9 @@ def anki_card_generic_fully_formed(
                          generic_guid_idx)
 
 
-@pyc.fixture
-@pyc.parametrize('reserved_name', ['Tags', 'Deck', 'Note Type', 'GUID'])
+@pytest_cases.fixture
+@pytest_cases.parametrize('reserved_name',
+                          ['Tags', 'Deck', 'Note Type', 'GUID'])
 def anki_card_reserved_names_field_names(reserved_name):
   """These names are guaranteed by the public API. They cannot be assigned
   manually (passed as field_names), cannot be duplicated (used in field_names
@@ -174,8 +176,9 @@ def anki_card_reserved_names_field_names(reserved_name):
   return reserved_name
 
 
-@pyc.fixture
-@pyc.parametrize('reserved_name', ['tags', 'deck_name', 'note_type', 'guid'])
+@pytest_cases.fixture
+@pytest_cases.parametrize('reserved_name',
+                          ['tags', 'deck_name', 'note_type', 'guid'])
 def anki_card_reserved_names_property_names(reserved_name):
   """These names are guaranteed by the public API. They cannot be assigned
   manually (passed as field_names), cannot be duplicated (used in field_names
@@ -183,7 +186,8 @@ def anki_card_reserved_names_property_names(reserved_name):
   return reserved_name
 
 
-@pyc.parametrize('reserved_name', [anki_card_reserved_names_property_names])
+@pytest_cases.parametrize('reserved_name',
+                          [anki_card_reserved_names_property_names])
 def test_reserved_names_specified_returns_value(
     anki_card_generic_fully_formed,
     reserved_name,
@@ -191,12 +195,13 @@ def test_reserved_names_specified_returns_value(
   assert hasattr(anki_card_generic_fully_formed, reserved_name)
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def anki_card_generic_fields(generic_fields):
   return gaggle.AnkiCard(generic_fields)
 
 
-@pyc.parametrize('reserved_name', [anki_card_reserved_names_property_names])
+@pytest_cases.parametrize('reserved_name',
+                          [anki_card_reserved_names_property_names])
 def test_reserved_names_not_specified_raises_key_error(
     anki_card_generic_fields,
     reserved_name,
@@ -205,7 +210,7 @@ def test_reserved_names_not_specified_raises_key_error(
     hasattr(anki_card_generic_fields, reserved_name)
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_field_name_string_base():
   return 'Field'
 
@@ -283,8 +288,8 @@ def test_write_as_tsv_no_write_permission_raises_unsupported_operation(
       anki_card_generic_fields.write_as_tsv(w)
 
 
-@pyc.parametrize('has_html, expected', [(has_html_false, False),
-                                        (has_html_true, True)])
+@pytest_cases.parametrize('has_html, expected', [(has_html_false, False),
+                                                 (has_html_true, True)])
 def test_parse_anki_header_bool_valid_input(has_html, expected):
   assert gaggle._parse_anki_header_bool(has_html) == expected
 
@@ -294,7 +299,7 @@ def test_parse_anki_header_bool_invalid_value_raises_value_error():
     gaggle._parse_anki_header_bool('')
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_field_dict(generic_field_names, generic_fields):
   test = gaggle._generate_field_dict(generic_field_names, generic_fields)
   return test
@@ -326,7 +331,7 @@ def test_generate_field_dict_mismatched_length_raises_value_error(
                                 generic_fields)
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_seen_names_set(anki_card_reserved_names):
   return set(anki_card_reserved_names)
 
@@ -338,7 +343,7 @@ def test_anki_card_reserved_names_matches_fixture(
   assert anki_card_generic_fields._reserved_names == anki_card_reserved_names
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def generic_unique_field_names_constructor(
     generic_field_names_remove_reserved,
     generic_fields,
@@ -536,8 +541,9 @@ def test_generate_unique_field_names_multiple_duplicate_default_name_before_assi
     generic_unique_field_names_constructor(field_names=duplicate_default_name)
 
 
-@pyc.parametrize('field_names', [None, new_field_names_remove_reserved])
-@pyc.parametrize('header', [None, new_header_gaggle_format])
+@pytest_cases.parametrize('field_names',
+                          [None, new_field_names_remove_reserved])
+@pytest_cases.parametrize('header', [None, new_header_gaggle_format])
 def test_create_cards_from_tsv_well_formed_arguments(
     case_anki_export_file_no_header_well_formed_content, field_names, header):
   # TODO: This is a minimal test suite for create_cards_from_tsv

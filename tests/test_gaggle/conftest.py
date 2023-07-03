@@ -22,7 +22,7 @@ import os.path
 import stat
 import pathlib
 
-import pytest_cases as pyc
+import pytest_cases
 import xxhash
 from gaggle import gaggle
 
@@ -119,14 +119,14 @@ def generate_well_formed_ankicard_data(num_cards=20):
   return rows
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def new_header_gaggle_format():
   contents = [('guid_idx', 0), ('note_type_idx', 1), ('deck_idx', 2),
               ('tags_idx', 6)]
   return dict(contents)
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def new_field_names_remove_reserved(new_header_gaggle_format):
   field_names = [f'Field{field_idx}' for field_idx in range(NUM_FIELDS)]
   for index in new_header_gaggle_format.values():
@@ -134,7 +134,7 @@ def new_field_names_remove_reserved(new_header_gaggle_format):
   return field_names
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def case_anki_export_file_well_formed_header_well_formed_content():
   header = generate_well_formed_header()
   content = generate_well_formed_ankicard_data()
@@ -146,7 +146,7 @@ def case_anki_export_file_well_formed_header_well_formed_content():
       header, content, filename=filename, hash_value=hash_value)
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def case_anki_export_file_no_header_well_formed_content():
   header = None
   content = generate_well_formed_ankicard_data()
@@ -156,7 +156,7 @@ def case_anki_export_file_no_header_well_formed_content():
       header, content, filename=filename, hash_value=hash_value)
 
 
-@pyc.fixture
+@pytest_cases.fixture
 def case_anki_export_file_well_formed_header_no_content():
   header = generate_well_formed_header()
   content = None
